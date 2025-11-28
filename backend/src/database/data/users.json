@@ -1,0 +1,13 @@
+[
+  {
+    "id": "12992072-3f6d-47d0-9c91-63b8393128c5",
+    "email": "khoas@gmail.com",
+    "password": "$2b$10$4P59511aiCaH/D8wYUMW9./LBeRezcS4oZjFBf2PUThkTP15RvZre",
+    "info": {
+      "age": 0,
+      "fullName": "",
+      "educationDegree": ""
+    },
+    "isVerified": false
+  }
+]
