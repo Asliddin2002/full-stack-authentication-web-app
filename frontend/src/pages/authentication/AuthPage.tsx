@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { motion } from "framer-motion";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
+import { useLogin } from "../../models/auth/useLogin";
+import { useAuth } from "../../lib/hooks/useAuth";
 
 export default function AuthPages() {
   const [page, setPage] = useState<"login" | "signup">("login");
@@ -12,14 +16,38 @@ export default function AuthPages() {
     confirm: "",
   });
 
+  const navigate = useNavigate();
+
+  const { mutate, error, isError, isPending } = useLogin();
+  const { handleSetToken } = useAuth();
+
   const inputClass =
     "w-full p-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
 
   const title = page === "login" ? "Welcome Back" : "Create Account";
   const buttonText = page === "login" ? "Login" : "Sign Up";
 
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    if (page === "login")
+      mutate(
+        { email: loginData.email, password: loginData.password },
+        {
+          onSuccess: (data) => {
+            if (data.token) {
+              localStorage.setItem("accessToken", data.token);
+              handleSetToken(data.token);
+              navigate("/");
+            }
+          },
+
+          onError: (error) => console.error("Error", error),
+        }
+      );
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950 p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -31,63 +59,74 @@ export default function AuthPages() {
             <h2 className="text-3xl font-bold mb-6 text-center text-gray-900 dark:text-white">
               {title}
             </h2>
-
-            {page === "login" ? (
-              <div className="space-y-4">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={loginData.email}
-                  onChange={(e) =>
-                    setLoginData({ ...loginData, email: e.target.value })
-                  }
-                  className={inputClass}
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={loginData.password}
-                  onChange={(e) =>
-                    setLoginData({ ...loginData, password: e.target.value })
-                  }
-                  className={inputClass}
-                />
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={signUpData.email}
-                  onChange={(e) =>
-                    setSignUpData({ ...signUpData, email: e.target.value })
-                  }
-                  className={inputClass}
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={signUpData.password}
-                  onChange={(e) =>
-                    setSignUpData({ ...signUpData, password: e.target.value })
-                  }
-                  className={inputClass}
-                />
-                <input
-                  type="password"
-                  placeholder="Confirm Password"
-                  value={signUpData.confirm}
-                  onChange={(e) =>
-                    setSignUpData({ ...signUpData, confirm: e.target.value })
-                  }
-                  className={inputClass}
-                />
-              </div>
-            )}
-
-            <Button className="w-full mt-6 py-3 text-lg rounded-xl">
-              {buttonText}
-            </Button>
+            <form action="" onSubmit={handleSubmit} autoComplete="off">
+              {page === "login" ? (
+                <div className="space-y-4">
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={loginData.email}
+                    onChange={(e) =>
+                      setLoginData({ ...loginData, email: e.target.value })
+                    }
+                    className={inputClass}
+                    autoComplete="new-email"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={loginData.password}
+                    onChange={(e) =>
+                      setLoginData({ ...loginData, password: e.target.value })
+                    }
+                    className={inputClass}
+                    autoComplete="new-password"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={signUpData.email}
+                    onChange={(e) =>
+                      setSignUpData({ ...signUpData, email: e.target.value })
+                    }
+                    className={inputClass}
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={signUpData.password}
+                    onChange={(e) =>
+                      setSignUpData({ ...signUpData, password: e.target.value })
+                    }
+                    className={inputClass}
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={signUpData.confirm}
+                    onChange={(e) =>
+                      setSignUpData({ ...signUpData, confirm: e.target.value })
+                    }
+                    className={inputClass}
+                  />
+                </div>
+              )}
+              {isError && (
+                <span className="text-xs font-semibold text-red-500">
+                  {error.message}
+                </span>
+              )}
+              <Button
+                type="submit"
+                disabled={isPending}
+                className="w-full mt-6 py-3 text-lg rounded-xl cursor-pointer"
+              >
+                {buttonText}
+              </Button>
+            </form>
 
             <div className="text-center mt-4 text-sm text-white">
               {page === "login" ? (

@@ -4,6 +4,7 @@ import { JSONDatabase } from "./database";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
 import jwt from "jsonwebtoken";
+import cors from "cors";
 
 type info = {
   age: number;
@@ -22,6 +23,13 @@ interface User {
 const app = express();
 
 const db = new JSONDatabase<User>("users.json");
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
@@ -94,7 +102,7 @@ app.post("/api/log-in", async (req, res) => {
       res.json({ token });
     });
   } else {
-    res.sendStatus(401);
+    res.status(401).json({ message: "Email or password incorrect!" });
   }
 });
 
