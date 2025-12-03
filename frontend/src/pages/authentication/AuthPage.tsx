@@ -6,6 +6,10 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { useLogin } from "../../models/auth/useLogin";
 import { useAuth } from "../../lib/hooks/useAuth";
+import { useSignUp } from "../../models/auth/useSignUp";
+
+const inputClass =
+  "w-full p-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
 
 export default function AuthPages() {
   const [page, setPage] = useState<"login" | "signup">("login");
@@ -18,19 +22,28 @@ export default function AuthPages() {
 
   const navigate = useNavigate();
 
-  const { mutate, error, isError, isPending } = useLogin();
-  const { handleSetToken } = useAuth();
+  const {
+    mutate: login,
+    error: loginErr,
+    isError: isLoginErr,
+    isPending: isLoginPending,
+  } = useLogin();
 
-  const inputClass =
-    "w-full p-3 rounded-xl bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition";
+  const {
+    mutate: signUp,
+    error: signUpErr,
+    isError: isSignUpErr,
+    isPending: isSignUpPending,
+  } = useSignUp();
+  const { handleSetToken } = useAuth();
 
   const title = page === "login" ? "Welcome Back" : "Create Account";
   const buttonText = page === "login" ? "Login" : "Sign Up";
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (page === "login")
-      mutate(
+    if (page === "login") {
+      login(
         { email: loginData.email, password: loginData.password },
         {
           onSuccess: (data) => {
@@ -44,7 +57,27 @@ export default function AuthPages() {
           onError: (error) => console.error("Error", error),
         }
       );
+    } else if (page == "signup") {
+      if (signUpData.confirm === signUpData.password)
+        signUp(
+          { email: signUpData.email, password: signUpData.password },
+          {
+            onSuccess: (data) => {
+              if (data.token) {
+                localStorage.setItem("accessToken", data.token);
+                handleSetToken(data.token);
+                navigate("/");
+              }
+            },
+          }
+        );
+    }
   };
+
+  const buttonDisable =
+    page === "signup" &&
+    signUpData.confirm !== signUpData.password &&
+    !signUpData.email;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950 p-4">
@@ -82,6 +115,11 @@ export default function AuthPages() {
                     className={inputClass}
                     autoComplete="new-password"
                   />
+                  {isLoginErr && (
+                    <span className="text-xs font-semibold text-red-500">
+                      {loginErr.message}
+                    </span>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -93,6 +131,7 @@ export default function AuthPages() {
                       setSignUpData({ ...signUpData, email: e.target.value })
                     }
                     className={inputClass}
+                    autoComplete="new-email"
                   />
                   <input
                     type="password"
@@ -102,6 +141,7 @@ export default function AuthPages() {
                       setSignUpData({ ...signUpData, password: e.target.value })
                     }
                     className={inputClass}
+                    autoComplete="new-password"
                   />
                   <input
                     type="password"
@@ -111,17 +151,19 @@ export default function AuthPages() {
                       setSignUpData({ ...signUpData, confirm: e.target.value })
                     }
                     className={inputClass}
+                    autoComplete="new-password"
                   />
+                  {isSignUpErr && (
+                    <span className="text-xs font-semibold text-red-500">
+                      {signUpErr.message}
+                    </span>
+                  )}
                 </div>
               )}
-              {isError && (
-                <span className="text-xs font-semibold text-red-500">
-                  {error.message}
-                </span>
-              )}
+
               <Button
                 type="submit"
-                disabled={isPending}
+                disabled={isSignUpPending || isLoginPending || buttonDisable}
                 className="w-full mt-6 py-3 text-lg rounded-xl cursor-pointer"
               >
                 {buttonText}
