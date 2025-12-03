@@ -44,4 +44,10 @@ export class JSONDatabase<T> {
 
     return item;
   }
+  update(id: string, item: T) {
+    const data = this.readFile();
+    const filtered = data.filter((u: any) => u.id !== id);
+    filtered.push(item);
+    this.writeFile(filtered);
+  }
 }

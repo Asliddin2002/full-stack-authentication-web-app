@@ -1,12 +1,34 @@
 [
   {
-    "id": "12992072-3f6d-47d0-9c91-63b8393128c5",
-    "email": "khoas@gmail.com",
-    "password": "$2b$10$4P59511aiCaH/D8wYUMW9./LBeRezcS4oZjFBf2PUThkTP15RvZre",
+    "id": "6e938ca9-96b6-41ef-8b3d-690eab591026",
+    "email": "john@gmail.com",
+    "password": "$2b$10$IEx9JwljX4g4corEiew2FOrXD/GYNRPGqsWO50jIc9DKP4RqafVUK",
     "info": {
       "age": 0,
       "fullName": "",
       "educationDegree": ""
+    },
+    "isVerified": false
+  },
+  {
+    "id": "e1214e5a-520a-4370-8f50-4d345877a186",
+    "email": "suxrob@gmail.com",
+    "password": "$2b$10$VnOt5l8iIHinZi2wZozDWOqXCtNNJRtyt8z7/WAjLUbXEF9vvLCZK",
+    "info": {
+      "age": 21,
+      "fullName": "Ondamurodov Suxrobek",
+      "educationDegree": "Bachelor's degrees"
+    },
+    "isVerified": false
+  },
+  {
+    "id": "12992072-3f6d-47d0-9c91-63b8393128c5",
+    "email": "khoas@gmail.com",
+    "password": "$2b$10$4P59511aiCaH/D8wYUMW9./LBeRezcS4oZjFBf2PUThkTP15RvZre",
+    "info": {
+      "age": 23,
+      "fullName": "Asliddin Kholturaev",
+      "educationDegree": "Post Graduate"
     },
     "isVerified": false
   }
